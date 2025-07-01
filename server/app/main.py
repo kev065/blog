@@ -1,5 +1,5 @@
 from fastapi import FastAPI
-from app.api.v1 import api_router
+from app.api.v1.api_router import api_router
 from app.db.session import engine
 from app.db.base import Base
 
@@ -7,7 +7,7 @@ def create_tables():
     Base.metadata.create_all(bind=engine)
 
 def include_router(app):
-    app.include_router(api_router)
+    app.include_router(api_router, prefix="/api/v1")
 
 def start_application():
     app = FastAPI(title="Blog API", version="1.0.0")
