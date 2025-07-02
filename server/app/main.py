@@ -1,4 +1,5 @@
 from fastapi import FastAPI
+from fastapi.middleware.cors import CORSMiddleware
 from app.api.v1.api_router import api_router
 from app.db.session import engine
 from app.db.base import Base
@@ -11,6 +12,16 @@ def include_router(app):
 
 def start_application():
     app = FastAPI(title="Blog API", version="1.0.0")
+    
+    # CORS Middleware
+    app.add_middleware(
+        CORSMiddleware,
+        allow_origins=["*"],  # Allows all origins
+        allow_credentials=True,
+        allow_methods=["*"],  # Allows all methods
+        allow_headers=["*"],  # Allows all headers
+    )
+    
     create_tables()
     include_router(app)
     return app
