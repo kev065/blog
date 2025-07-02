@@ -1,22 +1,25 @@
 'use client';
 
 import { useEffect, useState, useRef } from 'react';
-import { useRouter } from 'next/navigation';
+import { useRouter, useParams } from 'next/navigation';
 import { Editor } from '@tinymce/tinymce-react';
 import { getPost, updatePost } from '@/lib/api';
 
-export default function EditPostPage({ params }: { params: { id: string } }) {
+export default function EditPostPage() {
+  const params = useParams();
+  const id = params.id as string;
   const [title, setTitle] = useState('');
   const editorRef = useRef(null);
   const router = useRouter();
 
   useEffect(() => {
+    if (!id) return;
     const fetchPost = async () => {
       try {
-        const postData = await getPost(params.id);
+        const postData = await getPost(id);
         setTitle(postData.title);
         if (editorRef.current) {
-          editorRef.current.setContent(postData.content);
+          (editorRef.current as any).setContent(postData.content);
         }
       } catch (error) {
         console.error('Failed to fetch post', error);
@@ -24,17 +27,17 @@ export default function EditPostPage({ params }: { params: { id: string } }) {
     };
 
     fetchPost();
-  }, [params.id]);
+  }, [id]);
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     if (editorRef.current) {
-      const content = editorRef.current.getContent();
+      const content = (editorRef.current as any).getContent();
       const token = localStorage.getItem('token');
       if (token) {
         try {
-          await updatePost(params.id, { title, content }, token);
-          router.push(`/posts/${params.id}`);
+          await updatePost(id, { title, content }, token);
+          router.push(`/posts/${id}`);
         } catch (error) {
           console.error('Failed to update post', error);
         }
@@ -58,7 +61,7 @@ export default function EditPostPage({ params }: { params: { id: string } }) {
         <div className="mb-4">
           <Editor
             apiKey="xhfrzfawrdlxqnltp24hr7yttftmdr86ptngg4rlr6k3km0l" // TinyMCE API key
-            onInit={(evt, editor) => (editorRef.current = editor)}
+            onInit={(evt, editor) => ((editorRef.current as any) = editor)}
             initialValue=""
             init={{
               height: 500,

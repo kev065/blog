@@ -7,7 +7,7 @@ import { createPost } from '@/lib/api';
 
 export default function NewPostPage() {
   const [title, setTitle] = useState('');
-  const editorRef = useRef(null);
+  const editorRef = useRef<any>(null);
   const router = useRouter();
 
   const handleSubmit = async (e: React.FormEvent) => {

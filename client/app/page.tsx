@@ -4,9 +4,19 @@ import { useEffect, useState } from 'react';
 import Link from 'next/link';
 import { getPosts, getCurrentUser } from '@/lib/api';
 
+interface Post {
+  id: number;
+  title: string;
+  content: string;
+}
+
+interface User {
+  email: string;
+}
+
 export default function HomePage() {
-  const [posts, setPosts] = useState([]);
-  const [user, setUser] = useState(null);
+  const [posts, setPosts] = useState<Post[]>([]);
+  const [user, setUser] = useState<User | null>(null);
 
   useEffect(() => {
     const fetchPosts = async () => {
