@@ -3,6 +3,14 @@
 import { useEffect, useState } from 'react';
 import Link from 'next/link';
 import { getPosts, getCurrentUser } from '@/lib/api';
+import { Button } from '@/components/ui/button';
+import {
+  Card,
+  CardContent,
+  CardFooter,
+  CardHeader,
+  CardTitle,
+} from '@/components/ui/card';
 
 interface Post {
   id: number;
@@ -13,6 +21,15 @@ interface Post {
 interface User {
   email: string;
 }
+
+// Function to create a preview from HTML content
+const createPreview = (htmlContent: string, length: number = 150) => {
+  const textContent = htmlContent.replace(/<[^>]+>/g, '');
+  if (textContent.length <= length) {
+    return textContent;
+  }
+  return textContent.substring(0, length) + '...';
+};
 
 export default function HomePage() {
   const [posts, setPosts] = useState<Post[]>([]);
@@ -45,34 +62,47 @@ export default function HomePage() {
   }, []);
 
   return (
-    <div className="container mx-auto p-4">
-      <div className="flex justify-between items-center mb-4">
-        <h1 className="text-4xl font-bold">Blog</h1>
-        <div>
-          {user ? (
-            <div className="flex items-center">
-              <span className="mr-4">Welcome, {user.email}</span>
-              <Link href="/posts/new" className="bg-blue-500 text-white px-4 py-2 rounded">
-                New Post
+    <div className="bg-background text-foreground min-h-screen">
+      <div className="container mx-auto p-4 md:p-8">
+        <header className="flex justify-between items-center mb-8">
+          <h1 className="text-4xl font-bold tracking-tight">Blog</h1>
+          <div>
+            {user ? (
+              <div className="flex items-center gap-4">
+                <span className="text-sm text-muted-foreground">Welcome, {user.email}</span>
+                <Link href="/posts/new" passHref>
+                  <Button>New Post</Button>
+                </Link>
+              </div>
+            ) : (
+              <Link href="/login" passHref>
+                <Button variant="secondary">Login</Button>
               </Link>
-            </div>
-          ) : (
-            <Link href="/login" className="bg-gray-500 text-white px-4 py-2 rounded">
-              Login
-            </Link>
-          )}
-        </div>
-      </div>
-      <div>
-        {posts.map((post) => (
-          <div key={post.id} className="mb-4 p-4 border rounded">
-            <h2 className="text-2xl font-bold">{post.title}</h2>
-            <div dangerouslySetInnerHTML={{ __html: post.content }} />
-            <Link href={`/posts/${post.id}`} className="text-blue-500">
-              Read more
-            </Link>
+            )}
           </div>
-        ))}
+        </header>
+
+        <main>
+          <div className="grid gap-8 md:grid-cols-2 lg:grid-cols-3">
+            {posts.map((post) => (
+              <Card key={post.id} className="flex flex-col">
+                <CardHeader>
+                  <CardTitle className="text-2xl font-bold">{post.title}</CardTitle>
+                </CardHeader>
+                <CardContent className="flex-grow">
+                  <p className="text-muted-foreground">
+                    {createPreview(post.content)}
+                  </p>
+                </CardContent>
+                <CardFooter>
+                  <Link href={`/posts/${post.id}`} passHref>
+                    <Button variant="outline" className="w-full">Read more</Button>
+                  </Link>
+                </CardFooter>
+              </Card>
+            ))}
+          </div>
+        </main>
       </div>
     </div>
   );
