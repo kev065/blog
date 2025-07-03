@@ -10,9 +10,8 @@ import { ThemeProvider } from "@/components/theme-provider"
 const inter = Inter({ subsets: ["latin"] })
 
 export const metadata: Metadata = {
-  title: "BlogSpace - Professional Blog Platform",
-  description: "A modern blog platform built with Next.js and FastAPI",
-    generator: 'v0.dev'
+  title: "BlogSpace - Read stories, share ideas",
+  description: "Professional blogging platform",
 }
 
 export default function RootLayout({
