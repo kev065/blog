@@ -23,6 +23,9 @@ export default function RootLayout({
     <html lang="en" suppressHydrationWarning>
       <head>
         <script src="https://cdn.tiny.cloud/1/no-api-key/tinymce/6/tinymce.min.js" referrerPolicy="origin"></script>
+        <link rel="icon" type="image/png" href="/books.png" />
+        <link rel="shortcut icon" type="image/png" href="/books.png" />
+        <link rel="apple-touch-icon" href="/books.png" />
       </head>
       <body className={inter.className}>
         <ThemeProvider attribute="class" defaultTheme="system" enableSystem disableTransitionOnChange>
