@@ -8,3 +8,4 @@ class User(Base):
     hashed_password = Column(String)
     is_active = Column(Boolean(), default=True)
     posts = relationship("Post", back_populates="owner")
+    comments = relationship("Comment", back_populates="user")
