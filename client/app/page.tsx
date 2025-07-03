@@ -1,109 +1,99 @@
-'use client';
+"use client"
 
-import { useEffect, useState } from 'react';
-import Link from 'next/link';
-import { getPosts, getCurrentUser } from '@/lib/api';
-import { Button } from '@/components/ui/button';
-import {
-  Card,
-  CardContent,
-  CardFooter,
-  CardHeader,
-  CardTitle,
-} from '@/components/ui/card';
-
-interface Post {
-  id: number;
-  title: string;
-  content: string;
-}
-
-interface User {
-  email: string;
-}
-
-// Function to create a preview from HTML content
-const createPreview = (htmlContent: string, length: number = 150) => {
-  const textContent = htmlContent.replace(/<[^>]+>/g, '');
-  if (textContent.length <= length) {
-    return textContent;
-  }
-  return textContent.substring(0, length) + '...';
-};
+import { useState, useEffect } from "react"
+import { api } from "@/lib/api"
+import type { Post } from "@/lib/types"
+import { PostCard } from "@/components/post-card"
+import { Input } from "@/components/ui/input"
+import { Search, BookOpen } from "lucide-react"
 
 export default function HomePage() {
-  const [posts, setPosts] = useState<Post[]>([]);
-  const [user, setUser] = useState<User | null>(null);
+  const [posts, setPosts] = useState<Post[]>([])
+  const [filteredPosts, setFilteredPosts] = useState<Post[]>([])
+  const [searchTerm, setSearchTerm] = useState("")
+  const [isLoading, setIsLoading] = useState(true)
 
   useEffect(() => {
-    const fetchPosts = async () => {
-      try {
-        const postsData = await getPosts();
-        setPosts(postsData);
-      } catch (error) {
-        console.error('Failed to fetch posts', error);
-      }
-    };
+    loadPosts()
+  }, [])
 
-    const fetchUser = async () => {
-      const token = localStorage.getItem('token');
-      if (token) {
-        try {
-          const userData = await getCurrentUser(token);
-          setUser(userData);
-        } catch (error) {
-          console.error('Failed to fetch user', error);
-        }
-      }
-    };
+  useEffect(() => {
+    if (searchTerm) {
+      const filtered = posts.filter(
+        (post) =>
+          post.title.toLowerCase().includes(searchTerm.toLowerCase()) ||
+          post.content.toLowerCase().includes(searchTerm.toLowerCase()),
+      )
+      setFilteredPosts(filtered)
+    } else {
+      setFilteredPosts(posts)
+    }
+  }, [searchTerm, posts])
 
-    fetchPosts();
-    fetchUser();
-  }, []);
+  const loadPosts = async () => {
+    try {
+      const data = await api.getPosts()
+      setPosts(data)
+      setFilteredPosts(data)
+    } catch (error) {
+      console.error("Failed to load posts:", error)
+    } finally {
+      setIsLoading(false)
+    }
+  }
+
+  if (isLoading) {
+    return (
+      <div className="container mx-auto px-4 py-8">
+        <div className="flex items-center justify-center min-h-[400px]">
+          <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-primary"></div>
+        </div>
+      </div>
+    )
+  }
 
   return (
-    <div className="bg-background text-foreground min-h-screen">
-      <div className="container mx-auto p-4 md:p-8">
-        <header className="flex justify-between items-center mb-8">
-          <h1 className="text-4xl font-bold tracking-tight">Blog</h1>
-          <div>
-            {user ? (
-              <div className="flex items-center gap-4">
-                <span className="text-sm text-muted-foreground">Welcome, {user.email}</span>
-                <Link href="/posts/new" passHref>
-                  <Button>New Post</Button>
-                </Link>
-              </div>
-            ) : (
-              <Link href="/login" passHref>
-                <Button variant="secondary">Login</Button>
-              </Link>
-            )}
-          </div>
-        </header>
-
-        <main>
-          <div className="grid gap-8 md:grid-cols-2 lg:grid-cols-3">
-            {posts.map((post) => (
-              <Card key={post.id} className="flex flex-col">
-                <CardHeader>
-                  <CardTitle className="text-2xl font-bold">{post.title}</CardTitle>
-                </CardHeader>
-                <CardContent className="flex-grow">
-                  <p className="text-muted-foreground">
-                    {createPreview(post.content)}
-                  </p>
-                </CardContent>
-                <CardFooter>
-                  <Link href={`/posts/${post.id}`} passHref>
-                    <Button variant="outline" className="w-full">Read more</Button>
-                  </Link>
-                </CardFooter>
-              </Card>
-            ))}
-          </div>
-        </main>
+    <div className="container mx-auto px-4 py-8">
+      {/* Hero Section */}
+      <div className="text-center mb-12">
+        <div className="flex items-center justify-center mb-4">
+          <BookOpen className="h-12 w-12 text-primary mr-4" />
+          <h1 className="text-4xl font-bold">Welcome to BlogSpace</h1>
+        </div>
+        <p className="text-xl text-muted-foreground max-w-2xl mx-auto">
+          Discover insightful articles, engaging stories, and thought-provoking content from our community of writers.
+        </p>
       </div>
+
+      {/* Search Bar */}
+      <div className="max-w-md mx-auto mb-8">
+        <div className="relative">
+          <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-muted-foreground h-4 w-4" />
+          <Input
+            placeholder="Search articles..."
+            value={searchTerm}
+            onChange={(e) => setSearchTerm(e.target.value)}
+            className="pl-10"
+          />
+        </div>
+      </div>
+
+      {/* Posts Grid */}
+      {filteredPosts.length > 0 ? (
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+          {filteredPosts.map((post) => (
+            <PostCard key={post.id} post={post} />
+          ))}
+        </div>
+      ) : (
+        <div className="text-center py-12">
+          <BookOpen className="h-16 w-16 mx-auto text-muted-foreground mb-4" />
+          <h3 className="text-lg font-semibold mb-2">{searchTerm ? "No articles found" : "No articles yet"}</h3>
+          <p className="text-muted-foreground">
+            {searchTerm ? "Try adjusting your search terms" : "Check back later for new content"}
+          </p>
+        </div>
+      )}
     </div>
-  );
+  )
 }
