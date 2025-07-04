@@ -12,12 +12,12 @@ def create_post(post: PostCreate, db: Session = Depends(get_db), current_user: U
     return post_service.create_post(db=db, post=post)
 
 @router.get("/", response_model=list[Post])
-def read_posts(skip: int = 0, limit: int = 100, db: Session = Depends(get_db)):
-    return post_service.get_posts(db, skip=skip, limit=limit)
+async def read_posts(skip: int = 0, limit: int = 100, db: Session = Depends(get_db)):
+    return await post_service.get_posts(db, skip=skip, limit=limit)
 
 @router.get("/{post_id}", response_model=Post)
-def read_post(post_id: int, db: Session = Depends(get_db)):
-    db_post = post_service.get_post(db, post_id=post_id)
+async def read_post(post_id: int, db: Session = Depends(get_db)):
+    db_post = await post_service.get_post(db, post_id=post_id)
     if db_post is None:
         raise HTTPException(status_code=404, detail="Post not found")
     return db_post

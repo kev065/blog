@@ -3,7 +3,7 @@ from pydantic_settings import BaseSettings, SettingsConfigDict
 
 
 class Settings(BaseSettings):
-    SECRET_KEY: str = "your-secret-key-please-change-me"
+    SECRET_KEY: str
     ALGORITHM: str = "HS256"
     ACCESS_TOKEN_EXPIRE_MINUTES: int = 10080
 
@@ -12,6 +12,9 @@ class Settings(BaseSettings):
     POSTGRES_SERVER: str
     POSTGRES_PORT: int = 5432
     POSTGRES_DB: str
+
+    REDIS_HOST: str = "localhost"
+    REDIS_PORT: int = 6379
 
     SQLALCHEMY_DATABASE_URI: str | None = None 
 

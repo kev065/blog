@@ -2,11 +2,15 @@ from sqlalchemy.orm import Session
 from app.models.post import Post
 from app.schemas.post import PostCreate, PostUpdate
 from app.utils.html_sanitizer import sanitize_html
+from fastapi_cache.decorator import cache
+from app.utils.cache_key_builder import post_key_builder, posts_key_builder
 
 class PostService:
+    @cache(expire=60, key_builder=post_key_builder)
     def get_post(self, db: Session, post_id: int):
         return db.query(Post).filter(Post.id == post_id).first()
 
+    @cache(expire=60, key_builder=posts_key_builder)
     def get_posts(self, db: Session, skip: int = 0, limit: int = 100):
         return db.query(Post).offset(skip).limit(limit).all()
 
