@@ -5,10 +5,8 @@ from app.db.session import engine, SessionLocal
 from app.services.user_service import user_service
 from app.schemas.user import UserCreate
 
-# --- Configuration ---
 ADMIN_EMAIL = "admin@example.com"
 ADMIN_PASSWORD = "adminpassword"
-# -------------------
 
 def init_db():
     """Initializes the database and creates tables."""

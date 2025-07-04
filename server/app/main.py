@@ -1,11 +1,6 @@
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 from app.api.v1.api_router import api_router
-from app.db.session import engine
-from app.db.base import Base
-
-def create_tables():
-    Base.metadata.create_all(bind=engine)
 
 def include_router(app):
     app.include_router(api_router, prefix="/api/v1")
@@ -16,13 +11,12 @@ def start_application():
     # CORS Middleware
     app.add_middleware(
         CORSMiddleware,
-        allow_origins=["*"],  # Allows all origins
+        allow_origins=["*"],
         allow_credentials=True,
-        allow_methods=["*"],  # Allows all methods
-        allow_headers=["*"],  # Allows all headers
+        allow_methods=["*"],  
+        allow_headers=["*"], 
     )
     
-    create_tables()
     include_router(app)
     return app
 
