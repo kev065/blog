@@ -19,19 +19,19 @@ def create_comment_for_post(
     )
 
 @router.get("/posts/{post_id}/comments", response_model=list[Comment])
-def read_comments_for_post(
+async def read_comments_for_post(
     post_id: int, db: Session = Depends(get_db), skip: int = 0, limit: int = 10
 ):
-    return comment_service.get_comments_for_post(db, post_id=post_id, skip=skip, limit=limit)
+    return await comment_service.get_comments_for_post(db, post_id=post_id, skip=skip, limit=limit)
 
 @router.put("/comments/{comment_id}", response_model=Comment)
-def update_comment(
+async def update_comment(
     comment_id: int,
     comment: CommentUpdate,
     db: Session = Depends(get_db),
     current_user: User = Depends(get_current_user),
 ):
-    db_comment = comment_service.get_comment(db, comment_id)
+    db_comment = await comment_service.get_comment(db, comment_id)
     if not db_comment:
         raise HTTPException(status_code=404, detail="Comment not found")
     if db_comment.user_id != current_user.id:
@@ -39,12 +39,12 @@ def update_comment(
     return comment_service.update_comment(db=db, comment_id=comment_id, comment=comment)
 
 @router.delete("/comments/{comment_id}", response_model=Comment)
-def delete_comment(
+async def delete_comment(
     comment_id: int,
     db: Session = Depends(get_db),
     current_user: User = Depends(get_current_user),
 ):
-    db_comment = comment_service.get_comment(db, comment_id)
+    db_comment = await comment_service.get_comment(db, comment_id)
     if not db_comment:
         raise HTTPException(status_code=404, detail="Comment not found")
     if db_comment.user_id != current_user.id:
