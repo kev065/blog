@@ -61,5 +61,15 @@ services:
     networks:
       - blog-network
 
+  adminer:
+    image: adminer:latest
+    ports:
+      - "8080:8080"
+    depends_on:
+      - db
+    networks:
+      - blog-network
+    restart: unless-stopped
+
 volumes:
   postgres_data:
