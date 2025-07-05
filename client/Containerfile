@@ -1,7 +1,7 @@
-# Use an official Node.js runtime as a parent image
+# Node.js runtime as parent image
 FROM node:20-slim
 
-# Set the working directory in the container
+# working directory 
 WORKDIR /app
 
 # Install pnpm
@@ -16,8 +16,8 @@ RUN pnpm install
 # Copy the rest of the application code
 COPY . .
 
-# Expose the port that Next.js runs on
+# Expose Next.js port
 EXPOSE 3000
 
-# Run the application
+# Run app
 CMD ["pnpm", "run", "dev"]
