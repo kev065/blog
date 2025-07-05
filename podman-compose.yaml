@@ -33,5 +33,17 @@ services:
       - redis
     restart: unless-stopped
 
+  frontend:
+    build:
+      context: ./client
+      dockerfile: ./Containerfile
+    volumes:
+      - ./client:/app
+    ports:
+      - "3000:3000"
+    depends_on:
+      - backend
+    restart: unless-stopped
+
 volumes:
   postgres_data:
